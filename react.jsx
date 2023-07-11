@@ -175,6 +175,7 @@ import React, { useState, useEffect } from "react";
 const DataFetcher = () => {
   const [data, setData] = useState(null);
 
+  // useEffect accepts two arguments i.e effect function and an optional dependency array
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch("https://api.example.com/data");
@@ -187,3 +188,128 @@ const DataFetcher = () => {
 
   return <div>{data ? <p>Data: {data}</p> : <p>Loading.....</p>}</div>;
 };
+
+// 3. useContext - allows us to access the value of React context within a functional component. It allows functional components to access and use the value provided by a Context.Provider
+import React, { useContext } from "react";
+
+const ThemeContext = React.createContext("light");
+
+const ThemeComponent = () => {
+  const theme = useContext(ThemeContext);
+
+  return <p>Current theme: {theme}</p>;
+};
+
+// 4. useReducer - managing state using a reducer function. Used to manage complex state logic
+import React, { useReducer } from "react";
+
+const initialState = {
+  count: 0,
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "increment":
+      return { ...state, count: state.count + 1 };
+    case "decrement":
+      return { ...state, count: state.count - 1 };
+    case "reset":
+      return { ...state, count: 0 };
+    default:
+      return state;
+  }
+};
+
+const Count = () => {
+  // dispatch function is used to send actions to the reducer function
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      <p>Count: {state.count}</p>
+      // clicking the buttons dispatches the corresponding actions tp update the
+      state based on the reducer logic
+      <button onClick={() => dispatch({ type: "increment" })}>Increment</button>
+      <button onClick={() => dispatch({ type: "decrement" })}>Decrement</button>
+      <button onClick={() => dispatch({ type: "reset" })}>Reset</button>
+    </>
+  );
+};
+
+// 5. useCallback() - caches a callback function for better perfomance
+
+import React, { useState, useCallback } from "react";
+
+const Counting = () => {
+  const [count, setCount] = useState(0);
+
+  // useCallback prevents the `increment` and `decrement` functions from being re created and re rendered. Dependency array ensures functions are created only once during the imitial state
+  const increment = useCallback(() => {
+    setCount((prevCount) => prevCount + 1);
+  }, []);
+
+  const decrement = useCallback(() => {
+    setCount((prevCount) => prevCount - 1);
+  }, []);
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+      <button onClick={decrement}>Decrement</button>
+    </>
+  );
+};
+
+//6. useMemo() - caches a calculated value for better perfomance
+import React, { useState, useCallback } from "react";
+
+const Counted = () => {
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
+
+  const doubleCount1 = useMemo(() => {
+    console.log("Calculating doubleCount.....");
+  }, [count1]);
+
+  const tripleCount2 = useMemo(() => {
+    console.log("Calculating tripleCount2.....");
+  }, [count2]);
+
+  return (
+    <>
+      <p>Double of count1: {doubleCount1}</p>
+      <p>Triple of count2: {tripleCount2}</p>
+      <button onClick={() => setCount1(count1 + 1)}>Increment count1</button>
+      <button onClick={() => setCount2(count1 + 1)}>Increment count2</button>
+    </>
+  );
+};
+
+// 7. useRef - provides a mutable value that persists across renders
+import React, { useRef, useState } from "react";
+
+const FocusableInput = () => {
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    inputRef.current.focus();
+  }, []);
+
+  const handleButtonClick = () => {
+    inputRef.current.value = "";
+    inputRef.current.focus();
+  };
+
+  return (
+    <>
+      <input ref={inputRef} type="text" />
+      <button onClick={handleButtonClick}>Click and Focus</button>
+    </>
+  );
+};
+
+// WHAT IS STATE?
+// - refers to the data that a component holds and manages.It represents the dynamic nature of a component and determines how it behaves and renders in response to user unteraction.
+// - state allows components to store and update data internally
+// - Stateless components/ functional components: these are plain JS functions. Do not have internal state management and do not use lifecycle methods. Receive data as props and use that data to render output
+// - Stateful components / class components: have internal managed using the `state` object accessible via `this.state`
